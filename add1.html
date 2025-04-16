@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add1</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <header>
+    <a href="home.html" class="home-button">Home</a>
+    <h1>Add1</h1>
+  </header>
+
+  <main>
+    <section id="add-student">
+        <h2>1) Add a Student</h2>
+        <form onsubmit="" action="/addStudent" method="post">
+          <label for="studentFirstName">First Name:</label>
+          <input type="text" id="studentFirstName" name="firstName" required>
+          
+          <label for="studentLastName">Last Name:</label>
+          <input type="text" id="studentLastName" name="lastName" required>
+    
+          <label for="studentEmail">Email:</label>
+          <input type="text" id="studentEmail" name="email" required>
+    
+          <label for="studentRequests">Room Requests (e.g., private bathroom, kitchen, etc.):</label>
+          <input type="text" id="studentRequests" name="requests">
+    
+          <input type="submit" value="Add Student">
+          <div class="error" id="studentError"></div>
+        </form>
+      </section>
+  </main>
+  
+  <footer>
+  </footer>
+</body>
+</html>
