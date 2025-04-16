@@ -12,87 +12,83 @@ DROP TABLE IF EXISTS Bookstore;
 DROP TABLE IF EXISTS Book;
 DROP TABLE IF EXISTS Copy;
 DROP TABLE IF EXISTS Purchase;
+DROP TABLE IF EXISTS Plaza;
+DROP TABLE IF EXISTS Driver;
+DROP TABLE IF EXISTS Vehicle;
+DROP TABLE IF EXISTS Pass;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-CREATE TABLE Bookstore (
-bookstoreID INT PRIMARY KEY,
-bookstoreName CHAR(25) NOT NULL,
-state CHAR(2) NOT NULL,
-city CHAR(15) NOT NULL
+CREATE TABLE Plaza (
+    plazaNumber CHAR(4) PRIMARY KEY,
+    state CHAR(2) NOT NULL
 );
 
-CREATE TABLE Book (
-bookID INT PRIMARY KEY,
-bookName CHAR(25) NOT NULL,
-author CHAR(25) NOT NULL,
-publicationDate DATE,
-type ENUM('fic', 'non') NOT NULL
+CREATE TABLE Driver (
+    driverID CHAR(9) PRIMARY KEY,
+    name CHAR(25) NOT NULL,
+    age INT CHECK (age BETWEEN 15 AND 90)
 );
 
-CREATE TABLE Copy (
-copyID INT PRIMARY KEY,
-bookstoreID INT,
-bookID INT,
-price DECIMAL(4,2) CHECK (price BETWEEN 5.00 AND 50.00),
-FOREIGN KEY (bookstoreID) REFERENCES Bookstore(bookstoreID)
-ON DELETE RESTRICT
-ON UPDATE CASCADE,
-FOREIGN KEY (bookID) REFERENCES Book(bookID)
-ON DELETE SET NULL
-ON UPDATE CASCADE
+CREATE TABLE Vehicle (
+    licensePlate CHAR(6) PRIMARY KEY,
+    make CHAR(20) NOT NULL,
+    model CHAR(20) NOT NULL,
+    axles INT CHECK (axles IN (2, 3)),
+    driverID CHAR(9) NOT NULL,
+    FOREIGN KEY (driverID) REFERENCES Driver(driverID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
 );
 
-CREATE TABLE Purchase (
-purchaseID INT PRIMARY KEY,
-copyID INT,
-date DATE CHECK (date >= '2025-01-01'),
-time TIME,
-FOREIGN KEY (copyID) REFERENCES Copy(copyID)
-ON DELETE CASCADE
-ON UPDATE CASCADE
+CREATE TABLE Pass (
+    passID INT PRIMARY KEY,
+    licensePlate CHAR(6),
+    driverID CHAR(9),
+    plazaNumber CHAR(4),
+    passDate DATE,
+    passTime TIME,
+    cost DECIMAL(4,2) CHECK (cost IN (3.99, 5.99)),
+    FOREIGN KEY (licensePlate) REFERENCES Vehicle(licensePlate)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    FOREIGN KEY (driverID) REFERENCES Driver(driverID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    FOREIGN KEY (plazaNumber) REFERENCES Plaza(plazaNumber)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
 );
 
-INSERT INTO Bookstore (bookstoreID, bookstoreName, state, city) VALUES
-(0, 'Barnes and Noble', 'MO', 'Kansas City'),
-(5, 'Dickson Street Bookshop', 'AR', 'Fayetteville'),
-(11, 'Pearl\'s Books', 'AR', 'Fayetteville');
+INSERT INTO Plaza (plazaNumber, state) VALUES
+('A101', 'TX'),
+('B202', 'CA'),
+('C303', 'FL'),
+('D404', 'NY'),
+('E505', 'IL');
 
-INSERT INTO Book (bookID, bookName, author, publicationDate, type) VALUES
-(9, 'Brave New World', 'Aldous Huxley', '1932-02-04', 'fic'),
-(10, 'To Kill a Mockingbird', 'Harper Lee', '1960-07-11', 'fic'),
-(13, 'Godel, Escher, Bach', 'Douglas Hofstadter', '1979-01-01', 'non'),
-(21, 'The Brothers Karamazov', 'Fyodor Dostoevsky', '1880-11-01', 'fic'),
-(15, 'The Hiding Place', 'Corrie Ten Boom', '1971-01-01', 'non'),
-(16, 'The Grapes of Wrath', 'John Steinbeck', '1939-04-14', 'fic'),
-(37, 'Watchmen', 'Alan Moore', '1986-05-13', 'fic'),
-(4, 'Life of Pi', 'Yann Martel', '2001-09-11', 'fic'),
-(29, 'Unbroken', 'Laura Hillenbrand', '2010-11-16', 'non'),
-(42, 'The Return of The King', 'J. R. R. Tolkien', '1955-10-20', 'fic');
+INSERT INTO Driver (driverID, name, age) VALUES
+('D12345678', 'Alice Smith', 34),
+('D23456789', 'Bob Johnson', 45),
+('D34567890', 'Carlos Lopez', 28),
+('D45678901', 'Diana Patel', 52),
+('D56789012', 'Ethan Wong', 19);
 
-INSERT INTO Copy (copyID, bookstoreID, bookID, price) VALUES
-(0, 0, 42, 25.00),
-(1, 0, 13, 35.00),
-(2, 0, 37, 18.75),
-(3, 0, 10, 12.00),
-(4, 0, 29, 15.00),
-(5, 5, 16, 10.00),
-(6, 5, 42, 15.00),
-(7, 5, 4, 8.25),
-(8, 5, 21, 21.00),
-(9, 11, 10, 15.00),
-(10, 11, 9, 12.00),
-(11, 11, 15, 10.00);
+INSERT INTO Vehicle (licensePlate, make, model, axles, driverID) VALUES
+('TX1234', 'Toyota', 'Camry', 2, 'D12345678'),
+('CA5678', 'Ford', 'F-150', 3, 'D23456789'),
+('FL9988', 'Honda', 'Civic', 2, 'D34567890'),
+('NY1122', 'Chevy', 'Silverado', 3, 'D45678901'),
+('IL3344', 'Nissan', 'Altima', 2, 'D56789012');
 
-INSERT INTO Purchase (purchaseID, copyID, date, time) VALUES
-(0, 6, '2025-01-15', '10:32'),
-(1, 8, '2025-01-18', '08:45'),
-(2, 11, '2025-01-04', '14:37'),
-(3, 4, '2025-01-29', '18:00'),
-(4, 5, '2025-02-01', '12:18'),
-(5, 1, '2025-02-03', '21:30'),
-(6, 10, '2025-02-09', '16:18'),
-(7, 7, '2025-02-14', '23:00'),
-(8, 9, '2025-02-21', '20:05');
+INSERT INTO Pass (passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost) VALUES
+(1, 'TX1234', 'D12345678', 'A101', '2025-03-10', '08:15:00', 3.99),
+(2, 'CA5678', 'D23456789', 'B202', '2025-03-10', '09:20:00', 5.99),
+(3, 'FL9988', 'D34567890', 'C303', '2025-03-11', '11:05:00', 3.99),
+(4, 'NY1122', 'D45678901', 'D404', '2025-03-12', '15:45:00', 5.99),
+(5, 'IL3344', 'D56789012', 'E505', '2025-03-12', '18:30:00', 3.99),
+(6, 'CA5678', 'D23456789', 'A101', '2025-03-13', '07:10:00', 5.99),
+(7, 'TX1234', 'D12345678', 'C303', '2025-03-14', '14:00:00', 3.99),
+(8, 'NY1122', 'D45678901', 'B202', '2025-03-15', '10:25:00', 5.99);
 
 EOFMYSQL
