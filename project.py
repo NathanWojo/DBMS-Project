@@ -1,6 +1,7 @@
 import mysql.connector
 from tabulate import tabulate
 
+
 def open_database(hostname, user_name, mysql_pw, database_name):
     global conn
     conn = mysql.connector.connect(host=hostname,
