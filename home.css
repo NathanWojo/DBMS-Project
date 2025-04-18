@@ -45,6 +45,9 @@ nav a {
     padding: 10px 15px;
     border-radius: 5px;
     transition: background 0.3s ease;
+    display: inline-block;
+    width: 200px;
+    text-align: center;
 }
 nav a:hover {
     background: #888;

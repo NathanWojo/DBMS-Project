@@ -14,7 +14,7 @@
 
   <main>
     <section id="add-driver">
-      <h2>1) Add a Driver</h2>
+      <h2>Add a Driver</h2>
       <form id="add-driver" action="" method="post">
         <label for="driverID">Driver ID:</label>
         <input type="text" id="driverID" name="driverID" required>

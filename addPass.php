@@ -14,7 +14,7 @@
 
   <main>
     <section id="add-driver">
-      <h2>1) Add a Pass</h2>
+      <h2>Add a Pass</h2>
       <form id="add-driver" action="" method="post">
         <label for="passID">Pass ID:</label>
         <input type="text" id="passID" name="passID" required>
