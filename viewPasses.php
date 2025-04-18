@@ -29,7 +29,16 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stage']))
     {
       $plazaNumber     = escapeshellarg($_POST['plazaNumber']);
-      echo exec("python3 project.py view_passes " . "$plazaNumber");
+      
+      exec("python3 project.py view_passes " . "$plazaNumber", $lines, $status);
+      
+      if ($status !== 0) {
+        echo "<p class='error'>Error running Python: exit code $status</p>";
+      } else {
+        echo "<pre>";
+        echo htmlspecialchars(implode("\n", $lines));
+        echo "</pre>";
+      }
     }
   ?>
 

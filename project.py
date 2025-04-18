@@ -40,7 +40,6 @@ def close_db():  # use this function to close db
 
 #add driver
 def addDriver(driverID, name, age):
-    print("test")
     try:
         query = """
             insert into Driver (driverID, name, age)
