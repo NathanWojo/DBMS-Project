@@ -3,9 +3,10 @@ from tabulate import tabulate
 import sys 
 import traceback
 import logging
+import argparse
 
-mysql_username = 'nawojtow'
-mysql_passwork = 'Iox4quai'
+mysql_username = 'stephenn'
+mysql_password = 'Lohmoa4a'
 
 def open_database(hostname, user_name, mysql_pw, database_name):
     global conn
@@ -39,6 +40,7 @@ def close_db():  # use this function to close db
 
 #add driver
 def addDriver(driverID, name, age):
+    print("test")
     try:
         query = """
             insert into Driver (driverID, name, age)
@@ -103,7 +105,7 @@ def listPasses(plazaNumber):
             select Pass.passID, Driver.name as driverName, Pass.licensePlate, Pass.passDate, Pass.passTime, Pass.cost
             from Pass
             join Driver on Pass.driverID = Driver.driverID
-            wehre Pass.plazaNumber = %s
+            where Pass.plazaNumber = %s
             order by Driver.name asc
         """
         cursor.execute(query, (plazaNumber,))
@@ -228,8 +230,71 @@ def plazaReport(plazaNumber):
         print(f"\nWomp womp: failed to list")
 
 def main():
-    while True:
-        break
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest='cmd')
 
-if __name__ == "main":
+    # add driver sub command
+    p = sub.add_parser('add_driver')
+    p.add_argument('driver_id')
+    p.add_argument('name')
+    p.add_argument('age', type=int)
+
+    # add pass sub command
+    p2 = sub.add_parser('add_pass')
+    p2.add_argument('pass_id')
+    p2.add_argument('license_plate')
+    p2.add_argument('driver_id')
+    p2.add_argument('plaza_number')
+    p2.add_argument('pass_date')
+    p2.add_argument('pass_time')
+    p2.add_argument('cost', type=float)
+
+    p3 = sub.add_parser('view_passes')
+    p3.add_argument('plaza_number')
+
+    p4 = sub.add_parser('view_vehicles')
+
+    p5 = sub.add_parser('view_drivers')
+
+    p6 = sub.add_parser('view_plazas')
+    p6.add_argument('name')
+
+    p7 = sub.add_parser('plaza_report')
+    p7.add_argument('plaza_number')
+
+    args = parser.parse_args()
+
+    open_database('localhost', mysql_username, mysql_password, mysql_username)
+
+    try:
+        # commands
+        if args.cmd == 'add_driver':
+            addDriver(args.driver_id, args.name, args.age)
+ 
+        elif args.cmd == 'add_pass':
+            addPass(args.pass_id, args.license_plate, args.driver_id, args.plaza_number, args.pass_date, args.pass_time, args.cost)
+        
+        elif args.cmd == 'view_passes':
+            listPasses(args.plaza_number)
+        
+        elif args.cmd == 'view_vehicles':
+            listVehicles()
+
+        elif args.cmd == 'view_drivers':
+            listDrivers()
+
+        elif args.cmd == 'view_plazas':
+            listPlazas(args.name)
+
+        elif args.cmd == 'plaza_report':
+            plazaReport(args.plaza_number)
+
+        else:
+            print("No command specified. Use -h for help.")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+if __name__ == "__main__":
     main()
