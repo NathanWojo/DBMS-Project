@@ -14,4 +14,4 @@ chmod +x insertdata.sh
 
 On web browser:
 
-Open [url]
+Open https://csce.uark.edu/~nawojtow/Project/home
