@@ -43,36 +43,35 @@ def close_db():  # use this function to close db
 def addDriver(driverID, name, age, licensePlate, make, model, axles):
     try:
         query1 = """
-        insert into Driver (driverID, name, age)
+        insert ignore into Driver (driverID, name, age)
         values (%s, %s, %s)
         """
         cursor.execute(query1, (driverID, name, age))
         conn.commit()
-        print(f"\nDriver {name.strip()} added")
+        print(f"\nDriver {name.strip()} added or already exists")
 
         query2 = """
-        select 1 from Vehicle where licensePlate = %s
+        select 1 from Vehicle 
+        where licensePlate = %s
         """
         cursor.execute(query2, (licensePlate,))
         vehicle = cursor.fetchone()
 
-        if vehicle:
+        if not vehicle:
             query3 = """
-            update Vehicle
-            set driverID = %s
-            where licensePlate = %s
+            insert into Vehicle (licensePlate, make, model, axles)
+            values (%s, %s, %s, %s)
             """
-            cursor.execute(query3, (driverID, licensePlate))
+            cursor.execute(query3, (licensePlate, make, model, axles))
             conn.commit()
-            print(f"Vehicle with plate {licensePlate} assigned to {name.strip()}")
-        else:
-            query4 = """
-            insert into Vehicle (licensePlate, make, model, axles, driverID)
-            values (%s, %s, %s, %s, %s)
-            """
-            cursor.execute(query4, (licensePlate, make, model, axles, driverID))
-            conn.commit()
-            print(f"New vehicle with plate {licensePlate} created and assigned to {name.strip()}")
+            print(f"\nNew vehicle with plate {licensePlate} created")
+
+        query4 = """
+        insert ignore into VehicleOwner (licensePlate, driverID)
+        values (%s, %s)
+        """
+        cursor.execute(query4, (licensePlate, driverID))
+        conn.commit()
 
     except mysql.connector.Error as err:
         print(f"\nWomp womp: failed to add")
@@ -84,17 +83,25 @@ def addPass(passID, licensePlate, driverID, plazaNumber, cost):
         time = datetime.now().strftime("%H:%M:%S")
 
         query1 = """
-        select axles, driverID from Vehicle
+        select axles from Vehicle
         where licensePlate = %s
         """
         cursor.execute(query1, (licensePlate,))
-        vehicle = cursor.fetchone()
-        if not vehicle:
+        result = cursor.fetchone()
+        if not result:
             print(f"\nWomp womp: vehicle with license plate {licensePlate} does not exist")
             return
+        axleCount = result[0]
 
-        axleCount = vehicle[0]
-
+        query2 = """
+        select 1 from VehicleOwner
+        where licensePlate = %s and driverID = %s
+        """
+        cursor.execute(query2, (licensePlate, driverID))
+        if cursor.fetchone() is None:
+            print(f"\nWomp womp: driver {driverID} is not associated with given vehicle")
+            return
+        
         if axleCount == 2 and cost != 3.99:
             print("\nWomp womp: cost must be 3.99 for 2-axle vehicles")
             return
@@ -102,20 +109,20 @@ def addPass(passID, licensePlate, driverID, plazaNumber, cost):
             print("\nWomp womp: cost must be 5.99 for 3-axle vehicles")
             return
 
-        query2 = """
+        query3 = """
         select 1 from Plaza
         where plazaNumber = %s
         """
-        cursor.execute(query2, (plazaNumber,))
+        cursor.execute(query3, (plazaNumber,))
         if cursor.fetchone() is None:
             print(f"\nWomp womp: plaza {plazaNumber} does not exist")
             return
 
-        query3 = """
+        query4 = """
         insert into Pass (passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost)
         values (%s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query3, (passID, licensePlate, driverID, plazaNumber, date, time, cost))
+        cursor.execute(query4, (passID, licensePlate, driverID, plazaNumber, date, time, cost))
         conn.commit()
         print(f"\nPass {passID} added")
 
@@ -146,22 +153,25 @@ def listPasses(plazaNumber):
 def listVehicles():
     try:
         query = """
-        select 
-        V.licensePlate, V.make, V.model, V.axles, 
-        D.name as driverName, P.passDate, P.passTime, P.cost, P.plazaNumber
-        from Vehicle V
-        join Driver D on V.driverID = D.DriverID
-        left join (
-        select p1.*
-        from Pass p1
-        inner join (
-        select licensePlate, max(concat(passDate, ' ', passTime)) as latestPass
-        from Pass
-        group by licensePlate
-        ) latest on p1.licensePlate = latest.licensePlate
-        and concat(p1.passDate, ' ', p1.passTime) = latest.latestPass
-        ) P on V.licensePlate = P.licensePlate
-        order by V.licensePlate asc
+        SELECT 
+            V.licensePlate, V.make, V.model, V.axles, 
+            GROUP_CONCAT(D.name SEPARATOR ', ') AS driverNames,
+            P.passDate, P.passTime, P.cost, P.plazaNumber
+        FROM Vehicle V
+        LEFT JOIN VehicleOwner VO ON V.licensePlate = VO.licensePlate
+        LEFT JOIN Driver D ON VO.driverID = D.driverID
+        LEFT JOIN (
+            SELECT p1.*
+            FROM Pass p1
+            INNER JOIN (
+                SELECT licensePlate, MAX(CONCAT(passDate, ' ', passTime)) AS latestPass
+                FROM Pass
+                GROUP BY licensePlate
+            ) latest ON p1.licensePlate = latest.licensePlate
+            AND CONCAT(p1.passDate, ' ', p1.passTime) = latest.latestPass
+        ) P ON V.licensePlate = P.licensePlate
+        GROUP BY V.licensePlate, V.make, V.model, V.axles, P.passDate, P.passTime, P.cost, P.plazaNumber
+        ORDER BY V.licensePlate ASC
         """
         cursor.execute(query)
         result = cursor.fetchall()
@@ -171,19 +181,20 @@ def listVehicles():
         print(f"\nWomp womp: failed to list")
 
 #list all drivers that have 2 axled vehicles
-def listDrivers():
+def listDrivers(axles):
     try:
         query = """
         select distinct D.driverID, D.name, D.age
         from Driver D
-        join Vehicle V ON D.driverID = V.driverID
-        where V.axles = 2
+        join VehicleOwner VO on D.driverID = VO.driverID
+        join Vehicle V on VO.licensePlate = V.licensePlate
+        where V.axles = %s
         order by D.name asc
         """
-        cursor.execute(query)
+        cursor.execute(query, (axles,))
         result = cursor.fetchall()
         if not result:
-            print("\nWomp womp: no drivers with 2-axled vehicles")
+            print(f"\nWomp womp: no drivers with {axles}-axled vehicles")
             return
         print(printFormat(result))
 
@@ -281,6 +292,7 @@ def main():
     p4 = sub.add_parser('view_vehicles')
 
     p5 = sub.add_parser('view_drivers')
+    p5.add_argument('axles', type=int, choices=[2, 3])
 
     p6 = sub.add_parser('view_plazas')
     p6.add_argument('name')
@@ -295,10 +307,10 @@ def main():
     try:
         # commands
         if args.cmd == 'add_driver':
-            addDriver(args.driver_id, args.name, args.age)
+            addDriver(args.driver_id, args.name, args.age, args.license_plate, args.make, args.model, args.axles)
  
         elif args.cmd == 'add_pass':
-            addPass(args.pass_id, args.license_plate, args.driver_id, args.plaza_number, args.pass_date, args.pass_time, args.cost)
+            addPass(args.pass_id, args.license_plate, args.driver_id, args.plaza_number, args.cost)
         
         elif args.cmd == 'view_passes':
             listPasses(args.plaza_number)
@@ -307,7 +319,7 @@ def main():
             listVehicles()
 
         elif args.cmd == 'view_drivers':
-            listDrivers()
+            listDrivers(args.axles)
 
         elif args.cmd == 'view_plazas':
             listPlazas(args.name)
