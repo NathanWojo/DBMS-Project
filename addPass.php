@@ -32,7 +32,7 @@
         <label for="plazaNumber">Plaza Number:</label>
         <input type="text" id="plazaNumber" name="plazaNumber" required>
 
-        <label for="cost">Cost(FIX LATER):</label>
+        <label for="cost">Cost (3.99 or 5.99):</label>
         <input type="text" id="cost" name="cost" required>
 
         <input type="submit" name="stage" value="Add Pass">

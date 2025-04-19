@@ -2,6 +2,7 @@ html {
     overflow: hidden;
     height: 100%;
 }
+
 body {
     background: #222;
     color: #f4f4f4;
@@ -11,32 +12,36 @@ body {
     flex-direction: column;
     min-height: 100vh;
     text-align: center;
-    font-family: Arial, sans-serif;
     height: 100%;
     overflow: auto;
 }
+
 main {
     flex: 1 1 auto;
     overflow-y: auto;  
 }
+
+/* Fade-in container */
+main, header, footer, nav {
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+header { animation-delay: 0.2s; }
+nav { animation-delay: 0.4s; }
+footer { animation-delay: 0.6s; }
+main, nav { animation-delay: 0.8s; }
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
 header, footer {
     background: #444;
     padding: 10px;
     position: sticky;
     flex: 0 0 auto;
 }
-/* Fade-in container */
-main, header, footer, nav {
-    opacity: 0;
-    animation: fadeIn 1s forwards;
-  }
-  header { animation-delay: 0.2s; }
-  nav { animation-delay: 0.4s; }
-  footer { animation-delay: 0.6s; }
-  main, nav { animation-delay: 0.8s; }
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
+
 nav ul {
     list-style-type: none;
     padding: 0;
@@ -45,11 +50,21 @@ nav ul {
     justify-content: center;
     flex-wrap: wrap;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 }
+
 nav li {
     margin: 5px 10px;
 }
+
+/* Container for each nav button and its description */
+nav li div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Button style */
 nav a {
     text-decoration: none;
     color: #fff;
@@ -61,13 +76,26 @@ nav a {
     width: 200px;
     text-align: center;
 }
+
+/* Hover effect */
 nav a:hover {
     background: #888;
 }
+
+/* Description under button */
+nav li p {
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #ccc;
+    max-width: 220px;
+    text-align: center;
+}
+
 main {
     flex: 1;
     padding: 20px;
 }
+
 .home-button {
     background: #666;
     color: #fff;
@@ -80,18 +108,21 @@ main {
     left: 0;
     margin: 10px;
 }
+
 .home-button:hover {
     background: #888;
 }
 
 h1, h2 {
     color: #333;
-  }
+}
+
 h2 {
     background-color: #f2f2f2;
     padding: 10px;
     border-radius: 5px;
 }
+
 form {
     margin-bottom: 30px;
     padding: 15px;
@@ -101,11 +132,13 @@ form {
     flex-direction: column;
     align-items: center;
 }
+
 label {
     display: block;
     margin-top: 10px;
     font-weight: bold;
 }
+
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -114,20 +147,24 @@ select {
     padding: 8px;
     margin-top: 5px;
 }
+
 input[type="submit"] {
     margin-top: 15px;
     padding: 10px 20px;
     cursor: pointer;
 }
+
 .error {
     color: red;
     margin-top: 10px;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
+
 th, td {
     padding: 8px;
     border: 1px solid #ddd;
