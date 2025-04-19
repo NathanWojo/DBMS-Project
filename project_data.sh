@@ -1,5 +1,5 @@
 mysql <<EOFMYSQL
-use stephenn;
+use nawojtow;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS Purchase;
 DROP TABLE IF EXISTS Plaza;
 DROP TABLE IF EXISTS Driver;
 DROP TABLE IF EXISTS Vehicle;
+DROP TABLE IF EXISTS VehicleOwner;
 DROP TABLE IF EXISTS Pass;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -34,11 +35,19 @@ CREATE TABLE Vehicle (
     licensePlate CHAR(6) PRIMARY KEY,
     make CHAR(20) NOT NULL,
     model CHAR(20) NOT NULL,
-    axles INT CHECK (axles IN (2, 3)),
-    driverID CHAR(9) NOT NULL,
+    axles INT CHECK (axles IN (2, 3))
+);
+
+CREATE TABLE VehicleOwner (
+    licensePlate CHAR(6),
+    driverID CHAR(9),
+    PRIMARY KEY (licensePlate, driverID),
+    FOREIGN KEY (licensePlate) REFERENCES Vehicle(licensePlate)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     FOREIGN KEY (driverID) REFERENCES Driver(driverID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE Pass (
@@ -74,12 +83,19 @@ INSERT INTO Driver (driverID, name, age) VALUES
 ('D45678901', 'Diana Patel', 52),
 ('D56789012', 'Ethan Wong', 19);
 
-INSERT INTO Vehicle (licensePlate, make, model, axles, driverID) VALUES
-('TX1234', 'Toyota', 'Camry', 2, 'D12345678'),
-('CA5678', 'Ford', 'F-150', 3, 'D23456789'),
-('FL9988', 'Honda', 'Civic', 2, 'D34567890'),
-('NY1122', 'Chevy', 'Silverado', 3, 'D45678901'),
-('IL3344', 'Nissan', 'Altima', 2, 'D56789012');
+INSERT INTO Vehicle (licensePlate, make, model, axles) VALUES
+('TX1234', 'Toyota', 'Camry', 2),
+('CA5678', 'Ford', 'F-150', 3),
+('FL9988', 'Honda', 'Civic', 2),
+('NY1122', 'Chevy', 'Silverado', 3),
+('IL3344', 'Nissan', 'Altima', 2);
+
+INSERT INTO VehicleOwner (licensePlate, driverID) VALUES
+('TX1234', 'D12345678'),
+('CA5678', 'D23456789'),
+('FL9988', 'D34567890'),
+('NY1122', 'D45678901'),
+('IL3344', 'D56789012');
 
 INSERT INTO Pass (passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost) VALUES
 (1, 'TX1234', 'D12345678', 'A101', '2025-03-10', '08:15:00', 3.99),

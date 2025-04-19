@@ -32,13 +32,7 @@
         <label for="plazaNumber">Plaza Number:</label>
         <input type="text" id="plazaNumber" name="plazaNumber" required>
 
-        <label for="passDate">Pass Date(FIX LATER):</label>
-        <input type="text" id="passDate" name="passDate" required>
-
-        <label for="passTime">Pass Time(FIX LATER):</label>
-        <input type="text" id="passTime" name="passTime" required>
-
-        <label for="cost">Cost(FIX LATER):</label>
+        <label for="cost">Cost (3.99 or 5.99):</label>
         <input type="text" id="cost" name="cost" required>
 
         <input type="submit" name="stage" value="Add Pass">
@@ -54,12 +48,10 @@
       $LicensePlate     = escapeshellarg($_POST['LicensePlate']);
       $driverID     = escapeshellarg($_POST['driverID']);
       $plazaNumber     = escapeshellarg($_POST['plazaNumber']);
-      $passDate     = escapeshellarg($_POST['passDate']);
-      $passTime     = escapeshellarg($_POST['passTime']);
       $cost      = (float) $_POST['cost'];
 
       echo exec("python3 project.py add_pass "
-      . "$passID $LicensePlate $driverID $plazaNumber $passDate $passTime $cost");
+      . "$passID $LicensePlate $driverID $plazaNumber $cost");
     }
   ?>
 

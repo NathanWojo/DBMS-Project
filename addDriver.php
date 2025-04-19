@@ -20,6 +20,7 @@
     <section id="add-driver">
       <h2>Add a Driver</h2>
       <form id="add-driver" action="" method="post">
+        <!-- Driver info -->
         <label for="driverID">Driver ID:</label>
         <input type="text" id="driverID" name="driverID" required>
 
@@ -27,7 +28,20 @@
         <input type="text" id="name" name="name" required>
 
         <label for="age">Age:</label>
-        <input type="text" id="age" name="age" required>
+        <input type="number" id="age" name="age" required>
+
+        <!-- Vehicle info -->
+        <label for="licensePlate">License Plate:</label>
+        <input type="text" id="licensePlate" name="licensePlate" required>
+
+        <label for="make">Make:</label>
+        <input type="text" id="make" name="make" required>
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" required>
+
+        <label for="axles">Axles (2 or 3):</label>
+        <input type="number" id="axles" name="axles" min="2" max="3" required>
 
         <input type="submit" name="stage" value="Add Driver">
         <div class="error" id="passError"></div>
@@ -42,8 +56,13 @@
       $name     = escapeshellarg($_POST['name']);
       $age      = (int) $_POST['age'];
 
+      $licensePlate = escapeshellarg($_POST['licensePlate']);
+      $make         = escapeshellarg($_POST['make']);
+      $model        = escapeshellarg($_POST['model']);
+      $axles        = (int) $_POST['axles'];
+
       echo exec("python3 project.py add_driver "
-      . "$driverID $name $age");
+        . "$driverID $name $age $licensePlate $make $model $axles");
     }
   ?>
 
