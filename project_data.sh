@@ -1,5 +1,5 @@
 mysql <<EOFMYSQL
-use stephenn;
+use nawojtow;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
