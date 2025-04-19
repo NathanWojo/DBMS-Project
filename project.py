@@ -1,5 +1,6 @@
 import mysql.connector
 from tabulate import tabulate
+from datetime import datetime
 import sys 
 import traceback
 import logging
@@ -77,8 +78,11 @@ def addDriver(driverID, name, age, licensePlate, make, model, axles):
         print(f"\nWomp womp: failed to add")
 
 #add pass, make sure 2 axles maps to 3.99 and 3 axles maps to 5.99
-def addPass(passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost):
+def addPass(passID, licensePlate, driverID, plazaNumber, cost):
     try:
+        date = datetime.now().strftime("%Y-%m-%d")
+        time = datetime.now().strftime("%H:%M:%S")
+
         query1 = """
         select axles, driverID from Vehicle
         where licensePlate = %s
@@ -111,7 +115,7 @@ def addPass(passID, licensePlate, driverID, plazaNumber, passDate, passTime, cos
         insert into Pass (passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost)
         values (%s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query3, (passID, licensePlate, driverID, plazaNumber, passDate, passTime, cost))
+        cursor.execute(query3, (passID, licensePlate, driverID, plazaNumber, date, time, cost))
         conn.commit()
         print(f"\nPass {passID} added")
 
@@ -269,8 +273,6 @@ def main():
     p2.add_argument('license_plate')
     p2.add_argument('driver_id')
     p2.add_argument('plaza_number')
-    p2.add_argument('pass_date')
-    p2.add_argument('pass_time')
     p2.add_argument('cost', type=float)
 
     p3 = sub.add_parser('view_passes')
