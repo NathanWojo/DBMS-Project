@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Pass</title>
+  <title>Add Driver</title>
   <link rel="stylesheet" href="home.css">
 </head>
 <body>
@@ -13,29 +13,37 @@
         <path d="M1 6V15H6V11C6 9.89543 6.89543 9 8 9C9.10457 9 10 9.89543 10 11V15H15V6L8 0L1 6Z" fill="#FFFFFF"/>
         </svg>
     </a>
-    <h1>Add Pass</h1>
+    <h1>Add Driver</h1>
   </header>
 
   <main>
     <section id="add-driver">
-      <h2>Add a Pass</h2>
+      <h2>Add a Driver</h2>
       <form id="add-driver" action="" method="post">
-        <label for="passID">Pass ID:</label>
-        <input type="text" id="passID" name="passID" required>
-
-        <label for="LicensePlate">License Plate:</label>
-        <input type="text" id="LicensePlate" name="LicensePlate" required>
-
+        <!-- Driver info -->
         <label for="driverID">Driver ID:</label>
         <input type="text" id="driverID" name="driverID" required>
 
-        <label for="plazaNumber">Plaza Number:</label>
-        <input type="text" id="plazaNumber" name="plazaNumber" required>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
 
-        <label for="cost">Cost(FIX LATER):</label>
-        <input type="text" id="cost" name="cost" required>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
 
-        <input type="submit" name="stage" value="Add Pass">
+        <!-- Vehicle info -->
+        <label for="licensePlate">License Plate:</label>
+        <input type="text" id="licensePlate" name="licensePlate" required>
+
+        <label for="make">Make:</label>
+        <input type="text" id="make" name="make" required>
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" required>
+
+        <label for="axles">Axles (2 or 3):</label>
+        <input type="number" id="axles" name="axles" min="2" max="3" required>
+
+        <input type="submit" name="stage" value="Add Driver">
         <div class="error" id="passError"></div>
       </form>
     </section>
@@ -44,14 +52,17 @@
   <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stage']))
     {
-      $passID = escapeshellarg($_POST['passID']);
-      $LicensePlate     = escapeshellarg($_POST['LicensePlate']);
-      $driverID     = escapeshellarg($_POST['driverID']);
-      $plazaNumber     = escapeshellarg($_POST['plazaNumber']);
-      $cost      = (float) $_POST['cost'];
+      $driverID = escapeshellarg($_POST['driverID']);
+      $name     = escapeshellarg($_POST['name']);
+      $age      = (int) $_POST['age'];
 
-      echo exec("python3 project.py add_pass "
-      . "$passID $LicensePlate $driverID $plazaNumber $cost");
+      $licensePlate = escapeshellarg($_POST['licensePlate']);
+      $make         = escapeshellarg($_POST['make']);
+      $model        = escapeshellarg($_POST['model']);
+      $axles        = (int) $_POST['axles'];
+
+      echo exec("python3 project.py add_driver "
+        . "$driverID $name $age $licensePlate $make $model $axles");
     }
   ?>
 
