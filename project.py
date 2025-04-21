@@ -263,7 +263,8 @@ def plazaReport(plazaNumber):
 
     except mysql.connector.Error as err:
         print(f"\nWomp womp: failed to list")
-        
+
+#create a table that uses join to gather driver statistics
 def bonus():
     try:
         query1 = """
