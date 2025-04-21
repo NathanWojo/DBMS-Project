@@ -263,6 +263,51 @@ def plazaReport(plazaNumber):
 
     except mysql.connector.Error as err:
         print(f"\nWomp womp: failed to list")
+        
+def bonus():
+    try:
+        query1 = """
+        drop table if exists DriverStats
+        """
+        cursor.execute(query1)
+        conn.commit()
+        
+        query2 = """
+        create table DriverStats (
+        driverID char(9) primary key,
+        name char(25),
+        numVehicles INT,
+        numPasses INT
+        )
+        """
+        cursor.execute(query2)
+        conn.commit()
+
+        query3 = """
+        insert into DriverStats (driverID, name, numVehicles, numPasses)
+        select
+        D.driverID,
+        D.name,
+        count(distinct VO.licensePlate) as numVehicles,
+        count(distinct P.passID) as numPasses
+        from Driver D
+        left join VehicleOwner VO on D.driverID = VO.driverID
+        left join Pass P on D.driverID = P.driverID
+        group by D.driverID, D.name
+        """
+        cursor.execute(query3)
+        conn.commit()
+
+        query4 = """
+        select * from DriverStats
+        order by numPasses desc
+        """
+        cursor.execute(query4)
+        result = cursor.fetchall()
+        print(printFormat(result))
+
+    except mysql.connector.Error as err:
+        print(f"\nWomp womp: failed to create table")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -299,6 +344,8 @@ def main():
 
     p7 = sub.add_parser('plaza_report')
     p7.add_argument('plaza_number')
+    
+    p8 = sub.add_parser('bonus')
 
     args = parser.parse_args()
 
@@ -326,13 +373,14 @@ def main():
 
         elif args.cmd == 'plaza_report':
             plazaReport(args.plaza_number)
+            
+        elif args.cmd == 'bonus':
+            bonus()
 
         else:
             print("No command specified. Use -h for help.")
     finally:
-        cursor.close()
-        conn.close()
-
+        close_db()
 
 if __name__ == "__main__":
     main()
