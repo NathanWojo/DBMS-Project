@@ -6,8 +6,8 @@ import traceback
 import logging
 import argparse
 
-mysql_username = 'nawojtow'
-mysql_password = 'Iox4quai'
+mysql_username = 'stephenn'
+mysql_password = 'Lohmoa4a'
 
 def open_database(hostname, user_name, mysql_pw, database_name):
     global conn

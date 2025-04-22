@@ -1,5 +1,5 @@
 mysql <<EOFMYSQL
-use nawojtow;
+use stephenn;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS Driver;
 DROP TABLE IF EXISTS Vehicle;
 DROP TABLE IF EXISTS VehicleOwner;
 DROP TABLE IF EXISTS Pass;
-DROP TABLE IF EXISTS DriverStats
+DROP TABLE IF EXISTS DriverStats;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
